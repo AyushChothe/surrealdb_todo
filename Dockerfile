@@ -13,4 +13,6 @@ WORKDIR /app
 
 COPY --from=build /app/build/web .
 
-CMD python3 -m http.server $PORT
+EXPOSE 8000
+
+CMD python3 -m http.server 8000

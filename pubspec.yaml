@@ -4,24 +4,30 @@ publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: ">=2.19.2 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_hooks: ^0.18.6
+  freezed_annotation: ^2.4.1
   hooks_riverpod: ^2.3.1
+  json_annotation: ^4.8.1
   riverpod_annotation: ^2.0.1
-  surrealdb: ^0.6.2
+  surrealdb:
+    git: https://github.com/AyushChothe/surrealdb_flutter
+  # path: "../../DartProjects/surrealdb_flutter"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
   riverpod_lint: ^1.1.5
-  custom_lint: ^0.3.2
+  custom_lint: ^0.4.0
   riverpod_generator: ^2.1.3
-  build_runner: ^2.3.3
+  build_runner: ^2.4.6
+  freezed: ^2.3.3
+  json_serializable: ^6.6.2
 
 flutter:
   uses-material-design: true

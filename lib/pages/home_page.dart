@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:surrealdb_todo/common/hooks/use_live_query_hook.dart';
+import 'package:surrealdb_todo/common/models/todo.dart';
 import 'package:surrealdb_todo/providers/todos_provider.dart';
 
 class HomePage extends HookConsumerWidget {
@@ -7,45 +9,38 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final db = ref.watch(dbProvider.future);
-    final todosList = ref.watch(todosProvider);
+    final client = ref.watch(dbProvider);
+    final todosCtrl = ref.watch(todoControllerProvider);
+    final todos = useLiveQuery(
+      "Select * From Todos",
+      client: client,
+      fromJson: TodoModel.fromJson,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("SurrealDB Todo"),
       ),
       body: Center(
-        child: todosList.when(
-          data: (todos) {
-            if (todos.isEmpty) return const Text("No Todos Found");
-            return ListView.builder(
-              itemCount: todos.length,
-              itemBuilder: (context, index) {
-                final todo = todos[index];
-                return ListTile(
-                  onTap: () async {
-                    await (await db).query(
-                        "Update ${todo['id']} Set isDone=${!(todo["isDone"] as bool)}");
-                    ref.invalidate(todosProvider);
-                  },
-                  onLongPress: () async {
-                    await (await db).delete("${todo['id']}");
-                    ref.invalidate(todosProvider);
-                  },
-                  title: Text(todo['id'].toString()),
-                  subtitle:
-                      Text(todo["isDone"] as bool ? "Completed" : "Pending"),
-                );
-              },
-            );
-          },
-          error: (error, stackTrace) => Text(error.toString()),
-          loading: () => const CircularProgressIndicator(),
-        ),
+        child: (todos.isEmpty)
+            ? const Text("No Todos Found")
+            : ListView.builder(
+                itemCount: todos.length,
+                itemBuilder: (context, index) {
+                  final todo = todos[index];
+                  return ListTile(
+                    onTap: () async => await todosCtrl.toogleTodo(todo),
+                    onLongPress: () async => await todosCtrl.deleteTodo(todo),
+                    title: Text(todo.id!),
+                    subtitle: Text(todo.isCompleted ? "Completed" : "Pending"),
+                  );
+                },
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await (await db).create("Todos", {"name": "Todo", "isDone": false});
-          ref.invalidate(todosProvider);
+          await todosCtrl
+              .addTodo(TodoModel(title: "Todo 1", desc: "Description 1"));
         },
         child: const Icon(Icons.add),
       ),

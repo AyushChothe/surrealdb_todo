@@ -1,21 +1,35 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:surrealdb/surrealdb.dart';
+import 'package:surrealdb_todo/common/models/todo.dart';
 
 part 'todos_provider.g.dart';
 
-@Riverpod(dependencies: [db])
-Future<List<Map<String, Object?>>> todos(TodosRef ref) async {
-  final db = await ref.watch(dbProvider.future);
-  return await db.select("Todos");
+@riverpod
+SurrealDB db(DbRef ref) => SurrealDB('');
+
+@riverpod
+TodoController todoController(TodoControllerRef ref) {
+  final db = ref.watch(dbProvider);
+  return TodoController(db);
 }
 
-@Riverpod(dependencies: [])
-Future<SurrealDB> db(DbRef ref) async {
-  final client = SurrealDB('wss://sdb.up.railway.app/rpc');
+class TodoController {
+  TodoController(this._client);
 
-  client.connect();
-  await client.wait();
-  await client.use('test', 'test');
-  await client.signin(user: 'root', pass: 'root');
-  return client;
+  final SurrealDB _client;
+  final _todosTable = 'Todos';
+
+  Future<void> addTodo(TodoModel tm) async {
+    await _client.create(
+        _todosTable, tm.toJson()..removeWhere((k, v) => v == null));
+  }
+
+  Future<void> toogleTodo(TodoModel tm) async {
+    await _client.update(
+        tm.id!, tm.copyWith(isCompleted: !tm.isCompleted).toJson());
+  }
+
+  Future<void> deleteTodo(TodoModel tm) async {
+    await _client.delete(tm.id!);
+  }
 }
