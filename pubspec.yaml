@@ -15,8 +15,10 @@ dependencies:
   json_annotation: ^4.8.1
   riverpod_annotation: ^2.0.1
   surrealdb:
-    git: https://github.com/AyushChothe/surrealdb_flutter
-  # path: "../../DartProjects/surrealdb_flutter"
+    git: 
+      url: https://github.com/AyushChothe/surrealdb_flutter
+      ref: main
+    # path: "../../DartProjects/surrealdb_flutter"
 
 dev_dependencies:
   flutter_test:

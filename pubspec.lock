@@ -604,8 +604,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: "3e00163a4d9beb2e4bee90d1e03167971e2e12ab"
+      ref: main
+      resolved-ref: "7e67c20b071c117a5cfd3ce719deb7ec824caf8f"
       url: "https://github.com/AyushChothe/surrealdb_flutter"
     source: git
     version: "0.6.2"
